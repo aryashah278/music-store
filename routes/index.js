@@ -1,10 +1,9 @@
 var express = require('express');
-var Product = require('../models/product');
 var router = express.Router();
-var csrf = require('csurf');
 
-var csrfProtection = csrf();
-router.use(csrfProtection);
+
+var Product = require('../models/product');
+
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -14,8 +13,6 @@ router.get('/', function(req, res, next) {
   }).lean()
 });
 
-router.get('/user/signup', function(req, res, next){
-  res.render('user/signup', {csrfToken : req.csrfToken()})
-});
+
 
 module.exports = router;
