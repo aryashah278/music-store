@@ -3,26 +3,26 @@
     font-size: 16px;
 }
 
-.card{
+.index-product{
     height: 95%;
     margin:10px;
 }
 
-.card:hover{
+.index-product:hover{
     box-shadow: 10px 10px 10px -10px #000000;
     transition: all 200ms ease-out;
 }
 
-.card img{
+.index-product img{
     max-height: 150px;
 }
 
-.card-footer{
+.index-product .card-footer{
     background-color: white;
     border-top: 0 none;
 }
 
-.card-body{
+.index-product .card-body{
     border-bottom: 0 none;
 }
 
