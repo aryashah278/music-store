@@ -6,6 +6,7 @@ var logger = require('morgan');
 var expressHbs = require('express-handlebars');
 var indexRouter = require('./routes/index');
 var userRouter = require('./routes/user');
+// var cartRouter = require('./routes/shopping-cart');
 var mongoose = require('mongoose');
 var session = require('express-session');
 var passport = require('passport');
@@ -46,6 +47,7 @@ app.use(function(req, res, next){
 });
 
 app.use('/user', userRouter);
+// app.use('/shopping-cart', userRouter);
 app.use('/', indexRouter);
 
 

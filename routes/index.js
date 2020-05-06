@@ -25,11 +25,59 @@ router.get('/add-to-cart/:id', function(req, res, next){
     }
     cart.add(product, product.id);
     req.session.cart = cart;
-    console.log(req.session.cart);
+    // console.log(req.session.cart);
     res.redirect('/');
   });
 
 });
+
+router.get('/shopping-cart/addQty/:id',function(req, res, next){
+  console.log('Add one quantity' + req.params.id);
+  var productId = req.params.id;
+  var cart = new Cart(req.session.cart);
+  Product.findById(productId, function(err, product){
+    if(err){
+      return res.redirect('/shopping-cart');
+    }
+    cart.add(product, product.id);
+    req.session.cart = cart;
+    // console.log(req.session.cart);
+    res.redirect('/shopping-cart');
+  });
+});
+
+router.get('/shopping-cart/reduceQty/:id',function(req, res, next){
+  console.log('Reduce one quantity' + req.params.id);
+  var productId = req.params.id;
+  var cart = new Cart(req.session.cart);
+  Product.findById(productId, function(err, product){
+    if(err){
+      return res.redirect('/shopping-cart');
+    }
+    cart.remove(product, product.id);
+    req.session.cart = cart;
+    // console.log(req.session.cart);
+    res.redirect('/shopping-cart');
+  });
+
+});
+
+router.get('/shopping-cart/deleteAllQty/:id',function(req, res, next){
+  var productId = req.params.id;
+  var cart = new Cart(req.session.cart);
+  Product.findById(productId, function(err, product){
+    if(err){
+      return res.redirect('/shopping-cart');
+    }
+    cart.removeAll(product, product.id);
+    req.session.cart = cart;
+    // console.log(req.session.cart);
+    res.redirect('/shopping-cart');
+  });
+
+});
+
+
 
 router.get('/shopping-cart', function(req, res, next){
   if(!req.session.cart){
