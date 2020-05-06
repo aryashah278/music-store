@@ -6,13 +6,60 @@ var Product = require('../models/product');
 var Cart = require('../models/cart');
 var Order = require('../models/order');
 
+
+
+var pages = (req, res, next) => {
+
+  var currentPage = parseInt(req.params.page) || 1;
+
+  Product.countDocuments({}, function(err, count){
+    res.locals.totalProducts = count;
+    res.locals.currentPage = currentPage;
+    res.locals.totalPages = Math.ceil(res.locals.totalProducts / res.locals.limit);
+    next();
+  });
+}
+
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', pages, function(req, res, next) {
   var successMsg = req.flash('success')[0];
-  Product.find((error, result) =>{
+
+  var limit = res.locals.limit;
+  var offset = res.locals.limit * (res.locals.currentPage-1);
+  var query = Product.find({}).limit(limit).skip(offset).lean();
+  query.exec((error, result) => {
     if (error) return console.error(error);
-    res.render('shop/index', { title: 'Music Store', products: result, successMsg: successMsg, noMessages: !successMsg });
-  }).lean()
+    res.render('shop/index', { 
+      title: 'Music Store', 
+      products: result, 
+      successMsg: successMsg, 
+      noMessages: !successMsg
+    });
+  });
+});
+
+router.get('/:page', pages, function(req, res, next) {
+  if(req.params.page <= 1 ||  req.params.page > res.locals.totalPages){
+    res.redirect('/');
+  } 
+  else{
+    var successMsg = req.flash('success')[0];
+    var currentPage = req.params.page;
+    res.locals.currentPage = currentPage;
+    var limit = res.locals.limit;
+    var offset = res.locals.limit * (res.locals.currentPage-1);
+    
+    var query = Product.find({}).limit(limit).skip(offset).lean();
+    query.exec((error, result) => {
+      if (error) return console.error(error);
+      res.render('shop/index', { 
+        title: 'Music Store', 
+        products: result, 
+        successMsg: successMsg, 
+        noMessages: !successMsg
+      });
+    });
+  }
 });
 
 router.get('/add-to-cart/:id', function(req, res, next){
@@ -25,7 +72,6 @@ router.get('/add-to-cart/:id', function(req, res, next){
     }
     cart.add(product, product.id);
     req.session.cart = cart;
-    // console.log(req.session.cart);
     res.redirect('/');
   });
 
@@ -41,7 +87,6 @@ router.get('/shopping-cart/addQty/:id',function(req, res, next){
     }
     cart.add(product, product.id);
     req.session.cart = cart;
-    // console.log(req.session.cart);
     res.redirect('/shopping-cart');
   });
 });

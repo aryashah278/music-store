@@ -21,7 +21,7 @@ router.get('/profile', isLoggedIn, function(req, res, next){
         });
         console.log(orders);
         res.render('user/profile', {orders : orders});
-    });
+    }).lean();
 });
 
 router.get('/logout', isLoggedIn ,function(req, res, next){
