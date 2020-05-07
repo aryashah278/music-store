@@ -25,10 +25,14 @@
         {{/if}}
 
     </div>
-    <div class="col-md-10">
-        <div class="row">
+    <div class="col-md-10" >
+        <div class="row pull-right">
             <div id="success" class="alert alert-success" {{#if noMessages}} hidden {{/if}} style="padding: 10px;">
+            {{#if successMsg}}
                 {{ successMsg }}
+            {{else}}
+                {{deleteItemMsg}}
+            {{/if}}
             </div>
         </div>
         <div class="row">

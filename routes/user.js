@@ -20,8 +20,13 @@ router.get('/profile', isLoggedIn, function(req, res, next){
             cart = new Cart(order.cart);
             order.items = cart.generateArray();
         });
-        // console.log(orders);
-        res.render('user/profile', {orders : orders});
+        var orderFlag = true;
+        if(orders.length == 0){
+            orderFlag = false;
+        }
+        console.log(orderFlag);
+        console.log(orders);
+        res.render('user/profile', {orders : orders, orderFlag : orderFlag});
     }).lean();
 });
 

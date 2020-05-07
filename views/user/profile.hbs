@@ -1,9 +1,10 @@
 <div class="row">
     <div class="col-md-10 offset-md-1">
         <h1>User Profile</h1>
-        <hr>
+        <hr>  
+        {{#if orderFlag}}
         <h2>My Orders</h2>
-        {{# each orders }}
+        {{#each orders }}
             <div class="card">
                 <div class="card-body">
                     <ul class="list-group">
@@ -20,6 +21,12 @@
                 </div>
             </div>
         {{/each}}
+        {{else}}
+            <div class="offset-md-2">
+                <h4>No orders to show</h4>
+            </div>
+        {{/if}}
+    
         
     </div>
 </div>

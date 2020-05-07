@@ -1,57 +1,30 @@
-.price {
+.price{
     font-weight: bold;
     font-size: 16px;
 }
 
-.index-product {
+.index-product{
     height: 95%;
-    margin: 10px;
+    margin:10px;
 }
 
-.index-product:hover {
+.index-product:hover{
     box-shadow: 10px 10px 10px -10px #000000;
     transition: all 200ms ease-out;
 }
 
-.index-product img {
+.index-product img{
     max-height: 150px;
 }
 
-.index-product .card-footer {
+.index-product .card-footer{
     background-color: white;
     border-top: 0 none;
 }
 
-.index-product .card-body {
+.index-product .card-body{
     border-bottom: 0 none;
 }
 
-#password-strength-message {
-    padding: 5px 10px;
-    color: #FFFFFF;
-    border-radius: 4px;
-    margin-top: 5px;
-}
 
-#submit-message {
-    padding: 5px 10px;
-    color: #FFFFFF;
-    border-radius: 4px;
-    margin-top: 5px;
-}
-
-.medium-password {
-    background-color: #E4DB11;
-    border: #BBB418 1px solid;
-}
-
-.weak-password {
-    background-color: #FF6600;
-    border: #AA4502 1px solid;
-}
-
-.strong-password {
-    background-color: #12CC1A;
-    border: #0FA015 1px solid;
-}
 

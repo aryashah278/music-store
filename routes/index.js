@@ -1,11 +1,26 @@
 var express = require('express');
 var router = express.Router();
+const multer = require('multer');
+var path=require('path');
 
 
 var Product = require('../models/product');
 var Cart = require('../models/cart');
 var Order = require('../models/order');
 
+
+const storage=multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, __dirname+'/../public/images')
+  },
+  filename: function(req,file,cb){
+    cb(null,file.originalname);
+  }
+});
+
+const upload = multer({
+  storage:storage
+})
 
 
 var pages = (req, res, next) => {
@@ -20,22 +35,73 @@ var pages = (req, res, next) => {
   });
 }
 
-router.get('/addNewItem', function(req, res, next){
-    res.render('shop/newItem');
+router.get('/addNewItem', function(req, res){
+  res.render('shop/newItem');
 });
+
+
+
+router.post('/addNewItem', upload.single('imagePath'), function(req, res){
+  // console.log(req);
+  var prod = new Product({
+    imagePath: '/images/' + req.file.originalname,
+    title: req.body.title,
+    description: req.body.description,
+    category: req.body.category,
+    price: req.body.price,
+    stock: req.body.stock, 
+    isDeleted: false
+  })
+  prod.save(function(err, result){
+      if (err) throw err;
+      res.redirect('/');
+  });
+});
+
 
 router.get('/editItem/:id', function(req, res, next){
     Product.findById(req.params.id, function(err, result){
       if (err) console.log(err);
+      console.log(result);
       res.render('shop/editItem', {details: result })
     }).lean();
 });
+
+router.post('/editItem/:id', upload.single('imagePath'), function(req, res){
+  if(req.file){
+  Product.findOneAndUpdate(
+    {_id: req.params.id},
+    {
+      imagePath: '/images/' + req.file.originalname,
+      title: req.body.title,
+      description: req.body.description,
+      category: req.body.category,
+      price: req.body.price,
+      stock: req.body.stock, 
+      isDeleted: false
+  }).then((updateDoc) => {})
+  res.redirect('/')}
+  else{
+     Product.findOneAndUpdate({ _id: req.params.id},
+          {
+            title: req.body.title,
+            description: req.body.description,
+            category: req.body.category,
+            price: req.body.price,
+            stock: req.body.stock, 
+            isDeleted: false
+  }).then((updateDoc) => {})
+  res.redirect('/')
+  }
+});
+
 
 router.get('/deleteItem/:id', function(req, res, next){
   Product.findByIdAndUpdate(
     {_id: req.params.id},
     {isDeleted: true},
     function(err, result){
+      req.flash('deletedItemMsg','Successfully deleted a product!');
       if (err) console.log(err);
       res.redirect('/');
     }
@@ -151,6 +217,7 @@ router.get('/checkout', isLoggedIn, function(req,res,next){
         );
         order.save(function(err, result){
           req.flash('success','Successfully bought products!');
+          console.log(req.flash('success'));
           req.session.cart = null;
           res.redirect('/');
         });
@@ -168,6 +235,7 @@ router.get('/', pages, function(req, res, next) {
   }
   
   var successMsg = req.flash('success')[0];
+  var deletedItemMsg = req.flash('deletedItemMsg')[0];
   var limit = res.locals.limit;
   var offset = res.locals.limit * (res.locals.currentPage-1);
   var searchedFlag = false;
@@ -214,7 +282,8 @@ router.get('/', pages, function(req, res, next) {
       title: 'Music Store', 
       products: result, 
       successMsg: successMsg, 
-      noMessages: !successMsg,
+      deletedItemMsg: deletedItemMsg,
+      noMessages: !successMsg && !deletedItemMsg,
       searchedFlag: searchedFlag,
       searchedName : name,
       searchedCategory: category,
