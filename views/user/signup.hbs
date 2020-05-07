@@ -4,21 +4,38 @@
         {{#if hasErrors }}
             <div class="alert alert-danger">
                 {{#each messages}}
-                {{ this }}<br> 
+                {{ this }}<br>
                 {{/each}}
             </div>
         {{/if}}
         <form action="/user/signup" method="post">
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="text" id="email" name="email" class="form-control" />
+                <div class="row">
+                    <div class="col-md-11">
+                        <input type="text" id="email" name="email" class="form-control"/>
+                    </div>
+                    <div class="col-md-1">
+                        <span id="email-ok"><i class="fa fa-check" aria-hidden="true"></i></span>
+                    </div>
+                </div>
+                <div id="email-message"></div>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" class="form-control" />
+                <div class="row">
+                    <div class="col-md-11">
+                        <input type="password" id="signup-password" name="password" class="form-control"/>
+                    </div>
+                    <div class="col-md-1">
+                        <span id="password-ok"><i class="fa fa-check" aria-hidden="true"></i></span>
+                    </div>
+                </div>
+                <div id="password-message"></div>
             </div>
-            <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-            <button type="submit" class="btn btn-primary">Sign Up</button>
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
+            <button id="submit" type="submit" class="btn btn-primary">Sign Up</button>
+            <div id="submit-message"></div>
         </form>
     </div>
 </div>
