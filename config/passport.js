@@ -85,9 +85,9 @@ passport.use('local.verification', new LocalStrategy({
         if(err){
             return done(err);
         } if(user){
-            return done(null, false, req.flash('verification-error', false));
-        } else{
             return done(null, false, req.flash('verification-error', true));
+        } else{
+            return done(null, false, req.flash('verification-error', false));
         }
     });
 }));
