@@ -12,7 +12,7 @@ var pages = (req, res, next) => {
 
   var currentPage = parseInt(req.params.page) || 1;
 
-  Product.countDocuments({}, function(err, count){
+  Product.count({isDeleted: false}, function(err, count){
     res.locals.totalProducts = count;
     res.locals.currentPage = currentPage;
     res.locals.totalPages = Math.ceil(res.locals.totalProducts / res.locals.limit);
@@ -20,7 +20,27 @@ var pages = (req, res, next) => {
   });
 }
 
+router.get('/addNewItem', function(req, res, next){
+    res.render('shop/newItem');
+});
 
+router.get('/editItem/:id', function(req, res, next){
+    Product.findById(req.params.id, function(err, result){
+      if (err) console.log(err);
+      res.render('shop/editItem', {details: result })
+    }).lean();
+});
+
+router.get('/deleteItem/:id', function(req, res, next){
+  Product.findByIdAndUpdate(
+    {_id: req.params.id},
+    {isDeleted: true},
+    function(err, result){
+      if (err) console.log(err);
+      res.redirect('/');
+    }
+  );
+})
 
 router.get('/add-to-cart/:id', function(req, res, next){
   var productId = req.params.id;
@@ -129,9 +149,6 @@ router.get('/checkout', isLoggedIn, function(req,res,next){
             console.log("Successfully updated");
           }
         );
-        Product.findById(productId, function(err, product){
-            console.log(product);
-          });
         order.save(function(err, result){
           req.flash('success','Successfully bought products!');
           req.session.cart = null;
@@ -145,6 +162,11 @@ router.get('/checkout', isLoggedIn, function(req,res,next){
 
 /* GET home page. */
 router.get('/', pages, function(req, res, next) {
+  var isAdmin = false;
+  if(typeof(req.user) !== 'undefined'){
+    isAdmin = req.user.isAdmin;
+  }
+  
   var successMsg = req.flash('success')[0];
   var limit = res.locals.limit;
   var offset = res.locals.limit * (res.locals.currentPage-1);
@@ -152,7 +174,7 @@ router.get('/', pages, function(req, res, next) {
   var name = "";
   var category = "";
   if(Object.keys(req.query).length === 0){
-    var query = Product.find({}).limit(limit).skip(offset).lean();
+    var query = Product.find({isDeleted: false}).limit(limit).skip(offset).lean();
   }
   else{
     name = req.query.searchByName;
@@ -160,26 +182,26 @@ router.get('/', pages, function(req, res, next) {
     searchedFlag = true;
     var query;
     if(name != "" && category == ""){
-      query = Product.find({title: { $regex: name, $options: "i" }}).limit(limit).skip(offset).lean();
+      query = Product.find({title: { $regex: name, $options: "i" }, isDeleted: false}).limit(limit).skip(offset).lean();
       Product.count({title: { $regex: name, $options: "i" }}, function(err, count){
         res.locals.totalProducts = count;
         res.locals.totalPages = Math.ceil(res.locals.totalProducts / res.locals.limit);
       });
     } else if(name == "" && category != ""){
-      query = Product.find({category: category}).limit(limit).skip(offset).lean();
+      query = Product.find({category: category, isDeleted: false}).limit(limit).skip(offset).lean();
       Product.count({category: category}, function(err, count){
         res.locals.totalProducts = count;
         res.locals.totalPages = Math.ceil(res.locals.totalProducts / res.locals.limit);
         console.log(res.locals.totalPages);
       });
     } else if(name != "" && category != ""){
-      query = Product.find({category: category, title: { $regex: name, $options: "i" }}).limit(limit).skip(offset).lean();
+      query = Product.find({category: category,isDeleted: false, title: { $regex: name, $options: "i" }}).limit(limit).skip(offset).lean();
       Product.count({category: category, title: { $regex: name, $options: "i" }}, function(err, count){
         res.locals.totalProducts = count;
         res.locals.totalPages = Math.ceil(res.locals.totalProducts / res.locals.limit);
       });
     } else{
-      query = Product.find({}).limit(limit).skip(offset).lean();
+      query = Product.find({isDeleted: false}).limit(limit).skip(offset).lean();
       //default values are fine here.
     }
   }
@@ -195,7 +217,8 @@ router.get('/', pages, function(req, res, next) {
       noMessages: !successMsg,
       searchedFlag: searchedFlag,
       searchedName : name,
-      searchedCategory: category
+      searchedCategory: category,
+      isAdmin: isAdmin
     });
   });
 });
@@ -210,6 +233,11 @@ router.get('/:page', pages, function(req, res, next) {
     }
   } 
   else{
+    var isAdmin = false;
+    if(typeof(req.user) !== 'undefined'){
+      isAdmin = req.user.isAdmin;
+    }
+    console.log(isAdmin);
     var successMsg = req.flash('success')[0];
     var currentPage = req.params.page;
     res.locals.currentPage = currentPage;
@@ -220,7 +248,7 @@ router.get('/:page', pages, function(req, res, next) {
     var category = "";
 
     if(Object.keys(req.query).length === 0){
-      var query = Product.find({}).limit(limit).skip(offset).lean();
+      var query = Product.find({isDeleted: false}).limit(limit).skip(offset).lean();
     }
     else{
       name = req.query.searchByName;
@@ -228,27 +256,27 @@ router.get('/:page', pages, function(req, res, next) {
       searchedFlag = true;
       var query;
       if(name != "" && category == ""){
-        query = Product.find({title: { $regex: name, $options: "i" }}).limit(limit).skip(offset).lean();
+        query = Product.find({isDeleted: false, title: { $regex: name, $options: "i" }}).limit(limit).skip(offset).lean();
         Product.count({title: { $regex: name, $options: "i" }}, function(err, count){
           res.locals.totalProducts = count;
           res.locals.totalPages = Math.ceil(res.locals.totalProducts / res.locals.limit);
         });
       } else if(name == "" && category != ""){
-        query = Product.find({category: category}).limit(limit).skip(offset).lean();
+        query = Product.find({isDeleted: false, category: category}).limit(limit).skip(offset).lean();
         Product.count({category: category}, function(err, count){
           res.locals.totalProducts = count;
           res.locals.totalPages = Math.ceil(res.locals.totalProducts / res.locals.limit);
           console.log(res.locals.totalPages);
         });
       } else if(name != "" && category != ""){
-        query = Product.find({category: category, title: { $regex: name, $options: "i" }}).limit(limit).skip(offset).lean();
-        query = Product.find({category: category, title: { $regex: name, $options: "i" }}).limit(limit).skip(offset).lean();
+        query = Product.find({isDeleted: false, category: category, title: { $regex: name, $options: "i" }}).limit(limit).skip(offset).lean();
+        query = Product.find({isDeleted: false, category: category, title: { $regex: name, $options: "i" }}).limit(limit).skip(offset).lean();
         Product.count({category: category, title: { $regex: name, $options: "i" }}, function(err, count){
           res.locals.totalProducts = count;
           res.locals.totalPages = Math.ceil(res.locals.totalProducts / res.locals.limit);
         });
       } else{
-        query = Product.find({}).limit(limit).skip(offset).lean();
+        query = Product.find({isDeleted: false}).limit(limit).skip(offset).lean();
       }
     }
   
@@ -261,7 +289,8 @@ router.get('/:page', pages, function(req, res, next) {
         noMessages: !successMsg,
         searchedFlag: searchedFlag,
         searchedName : name,
-        searchedCategory: category
+        searchedCategory: category,
+        isAdmin: isAdmin
       });
     });
   }

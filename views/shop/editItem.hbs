@@ -1,0 +1,30 @@
+<div class="container" style="margin-top:20px;">
+<h1> Edit Item Information </h1>
+
+
+<form action="/editItem/{{this._id}}" method="POST">
+
+<div class="form-group">
+	<input type="text" name="title" class="form-control" value="{{details.title}}">
+</div>
+<div class="form-group">
+	<textarea name="description" class="form-control" >{{details.description}}</textarea>
+</div>
+<div class="form-group">
+	<input type="text" name="category" class="form-control" value="{{details.category}}">
+</div>
+<div class="form-group">
+	<input type="number" name="price" class="form-control" value="{{details.price}}">
+</div>
+<div class="form-group">
+	<input type="number" name="stock" class="form-control" value="{{details.stock}}">
+</div>
+<div class="form-group">
+	<button type="submit" class="btn btn-info" >Save</button>
+</div>
+
+</form>
+
+<a href="/">Cancel</a>
+
+</div>

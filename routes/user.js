@@ -15,11 +15,12 @@ router.get('/profile', isLoggedIn, function(req, res, next){
             return res.write('Error!');
         }
         var cart;
+        // console.log(req.user.isAdmin);
         orders.forEach(function(order){
             cart = new Cart(order.cart);
             order.items = cart.generateArray();
         });
-        console.log(orders);
+        // console.log(orders);
         res.render('user/profile', {orders : orders});
     }).lean();
 });
@@ -68,10 +69,6 @@ router.post('/signin', passport.authenticate('local.signin',{
         res.redirect('/user/profile');
     }
 });
-
-
-
-
 
 module.exports = router;
 

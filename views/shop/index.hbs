@@ -1,5 +1,5 @@
-<div class="row">
-    <div class="col-md-2">
+<div class="row" style="min-height: 100%;">
+    <div class="col-md-2" style="background-color: #DEDEDE; padding: 10px;min-height:100%">
         <form action="/" method="GET">
             <div class="form-group">
                 <label for="searchByName">Search</label>
@@ -15,18 +15,26 @@
                     <option value="Mandolin">Mandolin</option>
                 </select>
             </div>
-            <button type="submit">Search</button>
+            <button type="submit" class="btn btn-dark">Search</button>
         </form>
+        <br>
+        {{#if isAdmin}}
+            <div>
+                <a href="/addNewItem" class="btn btn-dark" role="button">Add new product</a>
+            </div>
+        {{/if}}
+
     </div>
     <div class="col-md-10">
         <div class="row">
-            <div id="success" class="alert alert-success" {{#if noMessages}} hidden {{/if}}>
+            <div id="success" class="alert alert-success" {{#if noMessages}} hidden {{/if}} style="padding: 10px;">
                 {{ successMsg }}
             </div>
         </div>
         <div class="row">
             <div class="container">
-                <div class="row">
+                <div class="row" style="padding: 10px;">
+                {{#if isAdmin}}
                 {{# each products}}
                     <div class="col-md-4">
                         <div class="card index-product">
@@ -35,16 +43,34 @@
                                 <h5 class="card-title">{{ this.title }}</h5>
                             </div>
                             <div class="card-footer">
-                                    <div class="price pull-left">${{this.price}}</div>
-                                    <a href="/add-to-cart/{{this._id}}" class="btn btn-success pull-right" role="button">Add to Cart <i class="fa fa-shopping-cart fa-lg"></i></a> 
+                                <div class="price pull-left">${{this.price}}</div>
+                                    <a href="/editItem/{{this._id}}" class="btn btn-info pull-right" role="button">Edit <i class="fa fa-pencil fa-lg" aria-hidden="true"></i></a>
+                                    <a href="/deleteItem/{{this._id}}" class="btn btn-danger pull-right" style="margin-right: 5px;" role="button">Delete <i class="fa fa-trash fa-lg" aria-hidden="true"></i></a>
                             </div>
                         </div>
                     </div>
                 {{/each}}
+                {{else}}
+                    {{# each products}}
+                    <div class="col-md-4">
+                        <div class="card index-product">
+                            <img src="{{ this.imagePath }}" alt='...' class="card-img-top img-responsive" />
+                            <div class="card-body">
+                                <h5 class="card-title">{{ this.title }}</h5>
+                            </div>
+                            {{this.isAdmin}}
+                            <div class="card-footer">
+                                <div class="price pull-left">${{this.price}}</div>    
+                                    <a href="/add-to-cart/{{this._id}}" class="btn btn-success pull-right" role="button">Add to Cart <i class="fa fa-shopping-cart fa-lg"></i></a> 
+                            </div>
+                        </div>
+                    </div>
+                    {{/each}}
+                {{/if}}
                 </div>
             </div>
         </div>
-
+        
         <div class="row" style="margin-top: 20px;">
             <div aria-label="Page navigation example" class="col-md-2 offset-md-5">
                 <ul class="pagination">
