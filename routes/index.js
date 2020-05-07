@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const multer = require('multer');
+var moment = require('moment');
 var path=require('path');
 
 
@@ -182,10 +183,14 @@ router.get('/checkout', isLoggedIn, function(req,res,next){
     res.redirect('/shopping-cart');
   } else{
     var cart = new Cart(req.session.cart);
+    var current_date = new Date();
     var order = new Order({
       user: req.user,
-      cart: cart
+      cart: cart,
+      order_date: current_date
     });
+    console.log(current_date);
+    console.log(order);
     
     var storedItems = cart.items;
     for (var items in storedItems){
@@ -218,7 +223,6 @@ router.get('/checkout', isLoggedIn, function(req,res,next){
         );
         order.save(function(err, result){
           req.flash('success','Successfully bought products!');
-          console.log(req.flash('success'));
           req.session.cart = null;
           res.redirect('/');
         });
