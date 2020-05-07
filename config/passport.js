@@ -76,3 +76,18 @@ passport.use('local.signin', new LocalStrategy({
     });
 
 }));
+
+passport.use('local.verification', new LocalStrategy({
+    usernameField: 'email',
+    passReqToCallback: true
+}, function(req, email, done){
+    User.findOne({'email': email}, function(err, user){
+        if(err){
+            return done(err);
+        } if(user){
+            return done(null, false, req.flash('verification-error', false));
+        } else{
+            return done(null, false, req.flash('verification-error', true));
+        }
+    });
+}));

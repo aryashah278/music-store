@@ -39,6 +39,12 @@ router.use('/', isLoggedOut, function(req, res, next){
     next();
 });
 
+router.get('/verification', passport.authenticate('local.verification',{
+    failureRedirect: '/user/signup',
+    failureFlash: false
+}), function(req, res, next){
+    res.send(req.flash('verification-error'));
+})
 router.get('/signup', function(req, res, next){
     var messages = req.flash('error');
     res.render('user/signup', {csrfToken : req.csrfToken(), messages: messages, hasErrors: messages.length > 0})
