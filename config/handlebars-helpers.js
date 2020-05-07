@@ -1,3 +1,6 @@
+var moment = require('moment');
+
+
 module.exports = {
     ifeq: function(a, b, options){
       return a == b;
@@ -14,5 +17,8 @@ module.exports = {
     },
     decrement: function(a, options){
         return parseInt(a)-1;
-    }
+    },
+    format_date: function(a, options){
+        return moment(a).format("MMM Do YYYY");
+    } 
   }
