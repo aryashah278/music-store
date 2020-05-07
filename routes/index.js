@@ -146,24 +146,68 @@ router.get('/checkout', isLoggedIn, function(req,res,next){
 /* GET home page. */
 router.get('/', pages, function(req, res, next) {
   var successMsg = req.flash('success')[0];
-
   var limit = res.locals.limit;
   var offset = res.locals.limit * (res.locals.currentPage-1);
-  var query = Product.find({}).limit(limit).skip(offset).lean();
+  var searchedFlag = false;
+  var name = "";
+  var category = "";
+  if(Object.keys(req.query).length === 0){
+    var query = Product.find({}).limit(limit).skip(offset).lean();
+  }
+  else{
+    name = req.query.searchByName;
+    category = req.query.searchByCategory;
+    searchedFlag = true;
+    var query;
+    if(name != "" && category == ""){
+      query = Product.find({title: { $regex: name, $options: "i" }}).limit(limit).skip(offset).lean();
+      Product.count({title: { $regex: name, $options: "i" }}, function(err, count){
+        res.locals.totalProducts = count;
+        res.locals.totalPages = Math.ceil(res.locals.totalProducts / res.locals.limit);
+      });
+    } else if(name == "" && category != ""){
+      query = Product.find({category: category}).limit(limit).skip(offset).lean();
+      Product.count({category: category}, function(err, count){
+        res.locals.totalProducts = count;
+        res.locals.totalPages = Math.ceil(res.locals.totalProducts / res.locals.limit);
+        console.log(res.locals.totalPages);
+      });
+    } else if(name != "" && category != ""){
+      query = Product.find({category: category, title: { $regex: name, $options: "i" }}).limit(limit).skip(offset).lean();
+      Product.count({category: category, title: { $regex: name, $options: "i" }}, function(err, count){
+        res.locals.totalProducts = count;
+        res.locals.totalPages = Math.ceil(res.locals.totalProducts / res.locals.limit);
+      });
+    } else{
+      query = Product.find({}).limit(limit).skip(offset).lean();
+      //default values are fine here.
+    }
+  }
+  
+  
   query.exec((error, result) => {
     if (error) return console.error(error);
+    
     res.render('shop/index', { 
       title: 'Music Store', 
       products: result, 
       successMsg: successMsg, 
-      noMessages: !successMsg
+      noMessages: !successMsg,
+      searchedFlag: searchedFlag,
+      searchedName : name,
+      searchedCategory: category
     });
   });
 });
 
 router.get('/:page', pages, function(req, res, next) {
   if(req.params.page <= 1 ||  req.params.page > res.locals.totalPages){
-    res.redirect('/');
+    if(Object.keys(req.query).length === 0){
+      res.redirect('/');
+    }
+    else{
+      res.redirect('/?searchByName='+req.query.searchByName + '&searchByCategory=' + req.query.searchByCategory);
+    }
   } 
   else{
     var successMsg = req.flash('success')[0];
@@ -171,19 +215,58 @@ router.get('/:page', pages, function(req, res, next) {
     res.locals.currentPage = currentPage;
     var limit = res.locals.limit;
     var offset = res.locals.limit * (res.locals.currentPage-1);
-    
-    var query = Product.find({}).limit(limit).skip(offset).lean();
+    var searchedFlag = false;
+    var name = "";
+    var category = "";
+
+    if(Object.keys(req.query).length === 0){
+      var query = Product.find({}).limit(limit).skip(offset).lean();
+    }
+    else{
+      name = req.query.searchByName;
+      category = req.query.searchByCategory;
+      searchedFlag = true;
+      var query;
+      if(name != "" && category == ""){
+        query = Product.find({title: { $regex: name, $options: "i" }}).limit(limit).skip(offset).lean();
+        Product.count({title: { $regex: name, $options: "i" }}, function(err, count){
+          res.locals.totalProducts = count;
+          res.locals.totalPages = Math.ceil(res.locals.totalProducts / res.locals.limit);
+        });
+      } else if(name == "" && category != ""){
+        query = Product.find({category: category}).limit(limit).skip(offset).lean();
+        Product.count({category: category}, function(err, count){
+          res.locals.totalProducts = count;
+          res.locals.totalPages = Math.ceil(res.locals.totalProducts / res.locals.limit);
+          console.log(res.locals.totalPages);
+        });
+      } else if(name != "" && category != ""){
+        query = Product.find({category: category, title: { $regex: name, $options: "i" }}).limit(limit).skip(offset).lean();
+        query = Product.find({category: category, title: { $regex: name, $options: "i" }}).limit(limit).skip(offset).lean();
+        Product.count({category: category, title: { $regex: name, $options: "i" }}, function(err, count){
+          res.locals.totalProducts = count;
+          res.locals.totalPages = Math.ceil(res.locals.totalProducts / res.locals.limit);
+        });
+      } else{
+        query = Product.find({}).limit(limit).skip(offset).lean();
+      }
+    }
+  
     query.exec((error, result) => {
       if (error) return console.error(error);
       res.render('shop/index', { 
         title: 'Music Store', 
         products: result, 
         successMsg: successMsg, 
-        noMessages: !successMsg
+        noMessages: !successMsg,
+        searchedFlag: searchedFlag,
+        searchedName : name,
+        searchedCategory: category
       });
     });
   }
 });
+
 
 
 module.exports = router;
