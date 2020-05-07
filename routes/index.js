@@ -91,6 +91,7 @@ router.post('/editItem/:id', upload.single('imagePath'), function(req, res){
             stock: req.body.stock, 
             isDeleted: false
   }).then((updateDoc) => {})
+  req.flash('editItemMsg','Successfully edited a product!');
   res.redirect('/')
   }
 });
@@ -236,6 +237,7 @@ router.get('/', pages, function(req, res, next) {
   
   var successMsg = req.flash('success')[0];
   var deletedItemMsg = req.flash('deletedItemMsg')[0];
+  var editItemMsg = req.flash('editItemMsg')[0];
   var limit = res.locals.limit;
   var offset = res.locals.limit * (res.locals.currentPage-1);
   var searchedFlag = false;
@@ -283,7 +285,8 @@ router.get('/', pages, function(req, res, next) {
       products: result, 
       successMsg: successMsg, 
       deletedItemMsg: deletedItemMsg,
-      noMessages: !successMsg && !deletedItemMsg,
+      editItemMsg : editItemMsg,
+      noMessages: !successMsg && !deletedItemMsg && !editItemMsg,
       searchedFlag: searchedFlag,
       searchedName : name,
       searchedCategory: category,
