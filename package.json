@@ -16,6 +16,7 @@
     "debug": "~2.6.9",
     "express": "~4.16.1",
     "express-paginatorjs": "^1.0.1",
+    "express-handlebars": "^4.0.4",
     "express-session": "^1.17.1",
     "express-validator": "5.3.1",
     "hbs": "~4.0.4",
