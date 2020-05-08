@@ -11,6 +11,7 @@ var csrfProtection = csrf();
 router.use(csrfProtection);
 
 router.get('/profile', isLoggedIn, function (req, res, next) {
+    var username = req.user.name;
     Order.find({user: req.user}, function (err, orders) {
         if (err) {
             return res.write('Error!');
@@ -27,7 +28,7 @@ router.get('/profile', isLoggedIn, function (req, res, next) {
         }
         console.log(orderFlag);
         console.log(orders);
-        res.render('user/profile', {orders: orders, orderFlag: orderFlag});
+        res.render('user/profile', {orders: orders, orderFlag: orderFlag, username: username});
     }).lean();
 });
 
