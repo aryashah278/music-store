@@ -120,7 +120,28 @@ $(document).ready(function () {
                 .addClass('error')
                 .html("Please enter a valid email");
         } else {
-            emailOk.show();
+            var emailValue = email.val();
+            $.ajax({
+                type: 'POST',
+                url: window.location.protocol + '//' + window.location.host + '/user/verification',
+                data: {email: emailValue, _csrf : $("#_csrf").val()},
+
+                success: function (data) {
+                    if (data == false) {
+                        emailMessage.hide();
+                        emailOk.show();
+                    } else {
+                        emailOk.hide();
+                        emailMessage.show()
+                            .removeClass()
+                            .addClass('error')
+                            .html("User Email already in use!");
+                    }
+                },
+                error: function (error) {
+                    console.log('Error: ' + error);
+                }
+            });
         }
     });
 
