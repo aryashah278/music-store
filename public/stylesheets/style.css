@@ -70,3 +70,15 @@
 .fa-check{
     color: #0FA015;
 }
+
+.page-item.active .page-link {
+    background-color: #343A40;
+    border-color: #343A40;
+    color: white;
+}
+
+.page-link > span {
+    color: #343A40;
+}
+
+
