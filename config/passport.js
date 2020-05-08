@@ -38,6 +38,7 @@ passport.use('local.signup', new LocalStrategy({
         newUser.email = email;
         newUser.password = newUser.encryptPassword(password);
         newUser.isAdmin = false;
+        newUser.name = req.body.name
         newUser.save(function(err, result){
             if (err) {
                 return done(err);
@@ -77,17 +78,3 @@ passport.use('local.signin', new LocalStrategy({
 
 }));
 
-passport.use('local.verification', new LocalStrategy({
-    usernameField: 'email',
-    passReqToCallback: true
-}, function(req, email, done){
-    User.findOne({'email': email}, function(err, user){
-        if(err){
-            return done(err);
-        } if(user){
-            return done(null, false, req.flash('verification-error', true));
-        } else{
-            return done(null, false, req.flash('verification-error', false));
-        }
-    });
-}));
